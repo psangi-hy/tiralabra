@@ -1,9 +1,11 @@
 #!/bin/sh
-rm *.gcda
-gcc --coverage -fprofile-exclude-files=test\.c -o test test.c -lm
-status=$?
+[ -e *.gcda ] && rm *.gcda
+gcc --coverage -fprofile-exclude-files=test\.c -o test test.c -lm \
+	|| exit 1
 
 ./test
+status=$?
+
 echo ""
 gcov test
 
