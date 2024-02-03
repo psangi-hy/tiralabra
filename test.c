@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <complex.h>
 #include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include "fft.c"
@@ -111,11 +112,34 @@ test_inverse_fft()
 	TEST_ASSERT(real32_array_approx_equal(output, fft_test_input, 8));
 }
 
+static void
+test_is_power_of_2()
+{
+	TEST_ASSERT(!is_power_of_2(0));
+	TEST_ASSERT(is_power_of_2(1));
+	TEST_ASSERT(is_power_of_2(32));
+	TEST_ASSERT(!is_power_of_2(68));
+	TEST_ASSERT(!is_power_of_2(477883288410294UL));
+	TEST_ASSERT(is_power_of_2(1UL << 63));
+}
+
+static void
+test_reverse_bits()
+{
+	TEST_ASSERT(reverse_bits(1, 1) == 1);
+	TEST_ASSERT(reverse_bits(2, 1) == 0);
+	TEST_ASSERT(reverse_bits(6, 8) == 96);
+	TEST_ASSERT(reverse_bits(SIZE_MAX, 64) == SIZE_MAX);
+	TEST_ASSERT(reverse_bits(1, 64) == 1UL << 63);
+}
+
 int
 main()
 {
 	RUN_TEST(test_fft);
 	RUN_TEST(test_inverse_fft);
+	RUN_TEST(test_is_power_of_2);
+	RUN_TEST(test_reverse_bits);
 
 	printf("%lu/%lu tests passed.\n", num_tests_passed, num_tests_run);
 
