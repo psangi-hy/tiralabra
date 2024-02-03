@@ -5,37 +5,6 @@ is_power_of_2(size_t n)
 	return n && !(n & (n - 1));
 }
 
-/* Lukee taulukon src joka step:nnestä arvosta ensimmäiset n kappaletta,
- * suorittaa näihin diskreetin Fourier-muunnoksen ja tallettaa tuloksena
- * saadut arvot peräkkäin taulukkoon dest. Luvun n on oltava 2:n potenssi. */
-static void
-fft_recursive(float complex *dest, float *src, size_t n, size_t step)
-{
-	/* Algoritmi perustuu pseudokoodiin, joka löytyy sivulta
-	 * https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm */
-
-	assert(is_power_of_2(n));
-
-	if (n == 1) {
-		dest[0] = (float complex)src[0];
-		return;
-	}
-
-	size_t half = n / 2;
-
-	fft_recursive(dest,        src,        half, step * 2);
-	fft_recursive(dest + half, src + step, half, step * 2);
-
-	for (size_t i = 0; i < half; i++) {
-		float complex p = dest[i];
-		float complex q = dest[i + half]
-			* cexpf(I * -2 * M_PI / n * i);
-
-		dest[i] = p + q;
-		dest[i + half] = p - q;
-	}
-}
-
 static int
 trailing_zeroes(size_t n)
 {
@@ -68,14 +37,33 @@ reverse_bits(size_t bits, int num_bits)
 	return res;
 }
 
-/* Suorittaa taulukon src ensimmäiseen n arvoon diskreetin Fourier-muunnoksen,
- * ja tallettaa tuloksen taulukkoon dest. Luvun n on oltava 2:n potenssi. */
 static void
-fft_iterative(float complex *dest, float *src, size_t n)
-{
-	/* Perustuu pseudokoodiin, joka löytyy sivulta
-	 * https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm */
+fft_in_place(float complex *data, size_t n) {
+	for (size_t m = 1; m <= n; m <<= 1) {
+		float complex om = cexpf(I * -2 * M_PI / m);
 
+		for (size_t j = 0; j < n; j += m) {
+			float complex o = (float complex)1.0f;
+
+			for (size_t k = 0; k < m / 2; k++) {
+				float complex t = o * data[j + k + m / 2];
+				float complex u = data[j + k];
+
+				data[j + k] = u + t;
+				data[j + k + m / 2] = u - t;
+
+				o *= om;
+			}
+		}
+	}
+}
+
+/* Suorittaa diskreetin Fourier-muunnoksen n-pituiseen
+ * taulukkoon src, ja tallettaa tuloksen taulukkoon dest.
+ * Luvun n on oltava kahden potenssi.*/
+static void
+fft(float complex *dest, float *src, size_t n)
+{
 	assert(is_power_of_2(n));
 
 	int log_n = trailing_zeroes(n);
@@ -84,22 +72,34 @@ fft_iterative(float complex *dest, float *src, size_t n)
 		dest[reverse_bits(i, log_n)] = (float complex)src[i];
 	}
 
-	for (size_t i = 0; i <= log_n; i++) {
-		size_t m = (size_t)1 << i;
-		float complex om = cexpf(I * -2 * M_PI / m);
+	fft_in_place(dest, n);
+}
 
-		for (size_t j = 0; j < n; j += m) {
-			float complex o = (float complex)1.0f;
+/* Muuntaa Fourier-muunnoksen n-pituisesta taulukosta src
+ * takaisin signaaliksi, ja tallettaa sen taulukkoon dest.
+ * Luvun n on oltava kahden potenssi.*/
+static void
+inverse_fft(float *dest, float complex *src, size_t n)
+{
+	assert(is_power_of_2(n));
 
-			for (size_t k = 0; k < m / 2; k++) {
-				float complex t = o * dest[j + k + m / 2];
-				float complex u = dest[j + k];
+	int log_n = trailing_zeroes(n);
 
-				dest[j + k] = u + t;
-				dest[j + k + m / 2] = u - t;
+	for (size_t i = 0; i < n; i++) {
+		size_t rev = reverse_bits(i, log_n);
 
-				o *= om;
-			}
+		if (rev > i) {
+			float complex tmp = src[i];
+			src[i] = src[rev];
+			src[rev] = tmp;
 		}
+
+		src[i] = conjf(src[i]);
+	}
+
+	fft_in_place(src, n);
+
+	for (size_t i = 0; i < n; i++) {
+		dest[i] = crealf(src[i]) / n;
 	}
 }

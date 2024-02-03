@@ -78,31 +78,44 @@ complex64_array_approx_equal(float complex *a, float complex *b, size_t n)
 	return 1;
 }
 
+/* Vertaa n-pituisten taulukoiden a ja b arvoja. */
+static int
+real32_array_approx_equal(float *a, float *b, size_t n)
+{
+	static float epsilon = 0.0001f;
+
+	for (size_t i = 0; i < n; i++)
+		if (fabsf(a[i] - b[i]) >= epsilon)
+			return 0;
+
+	return 1;
+}
+
 static void
-test_fft_recursive()
+test_fft()
 {
 	float complex output[8];
 
-	fft_recursive(output, fft_test_input, 8, 1);
+	fft(output, fft_test_input, 8);
 
 	TEST_ASSERT(complex64_array_approx_equal(output, fft_test_desired_output, 8));
 }
 
 static void
-test_fft_iterative()
+test_inverse_fft()
 {
-	float complex output[8];
+	float output[8];
 
-	fft_iterative(output, fft_test_input, 8);
+	inverse_fft(output, fft_test_desired_output, 8);
 
-	TEST_ASSERT(complex64_array_approx_equal(output, fft_test_desired_output, 8));
+	TEST_ASSERT(real32_array_approx_equal(output, fft_test_input, 8));
 }
 
 int
 main()
 {
-	RUN_TEST(test_fft_recursive);
-	RUN_TEST(test_fft_iterative);
+	RUN_TEST(test_fft);
+	RUN_TEST(test_inverse_fft);
 
 	printf("%lu/%lu tests passed.\n", num_tests_passed, num_tests_run);
 
