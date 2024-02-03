@@ -6,6 +6,8 @@ Dokumentit
 
 [Määrittelydokumentti](doc/maarittely.pdf)
 
+[Testausdokumentti](doc/testaus.md)
+
 Viikkoraportit
 --------------
 
