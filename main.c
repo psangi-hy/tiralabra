@@ -56,6 +56,36 @@ parse_size(char *s)
 	return res;
 }
 
+/* Aseta nollaksi taulukon data alkiot, jotka annetaan num_interval-pituisessa
+ * taulukossa intervals. */
+static void
+zero_intervals(float complex *data, struct interval *intervals, size_t num_intervals)
+{
+	for (size_t i = 0; i < num_intervals; i++) {
+		for (size_t j = intervals[i].start; j < intervals[i].end; j++) {
+			data[j] = 0.0f;
+		}
+	}
+}
+
+/* Luo taulukkoon dest signaali, jossa taulukon from signaali hiipuu tasaisesti
+ * pois samalla kun taulukon to signaali hiipuu sisään. Luku n on taulukoiden
+ * dest, from ja to pituus. */
+static void
+interpolate_signal(float *dest, size_t n, float *from, float *to)
+{
+	if (!n)
+		return;
+
+	float step = 1.0f / n;
+	float frac = step / 2;
+
+	for (size_t i = 0; i < n; i++) {
+		dest[i] = (1.0f - frac) * from[i] + frac * to[i];
+		frac += step;
+	}
+}
+
 int
 main(int argc, char **argv)
 {
@@ -70,8 +100,8 @@ main(int argc, char **argv)
 
 	size_t sample_length = parse_size(argv[1]);
 
-	if (!is_power_of_2(sample_length))
-		die("%s ei ole kahden potenssi.\n", argv[1]);
+	if (!is_power_of_2(sample_length) || sample_length & 1)
+		die("%s ei ole kahden positiivinen potenssi.\n", argv[1]);
 
 	size_t num_intervals = ((argc - 2) + 1) / 2;
 	struct interval *intervals = calloc(num_intervals, sizeof(struct interval));
@@ -85,25 +115,55 @@ main(int argc, char **argv)
 			intervals[i].end = sample_length;
 	}
 
-	/* Signaalinkäsittelysilmukka. */
+	/* Varaa puskurit signaalinkäsittelysilmukkaa varten. */
 
-	float *buf = calloc(sample_length, sizeof(float));
+	float *input = calloc(sample_length, sizeof(float));
 	float complex *transform = calloc(sample_length, sizeof(float complex));
+	float *intermediate[2] = {
+		calloc(sample_length, sizeof(float)),
+		calloc(sample_length, sizeof(float))
+	};
+	float *output = calloc(sample_length / 2, sizeof(float));
 
-	for (size_t nread; nread = fread(buf, sizeof(float), sample_length, stdin);) {
-		for (size_t i = nread; i < sample_length; i++)
-			buf[i] = 0.0f;
+	/* Jos luemme naiivisti sample_length pistettä tulosignaalia kerallaan
+	 * ja poistamme siitä taajuuksia, syntyy tulostetussa äänessä ikävää
+	 * poksahtelua, joka johtuu signaalin jatkuvuuden rikkoutumisesta eli
+	 * yhtäkkisistä muutoksista signaalin arvossa. Ajatukseni tämän ongelman
+	 * ratkaisemiseksi on suorittaa tämä operaatio sample_length pisteelle
+	 * lomittain aina sample_length / 2 pisteen välein. Jokainen piste
+	 * käsitellään siis kaksi kertaa, ja lopullinen tulos interpoloidaan
+	 * näiden vuorottelevien välitulosten välillä, jotta jatkuvuus säilyy.
+	 * Toivottavasti ymmärsit. */
 
-		fft(transform, buf, sample_length);
+	/* Ensimmäinen kierros tehdään silmukan ulkopuolella, koska muuten
+	 * tulosteen alkuun syntyy ylimääräistä hiljaisuutta, kun interpoloidaan
+	 * nollasignaalista ensimmäiseen välitulokseen. */
 
-		for (size_t i = 0; i < num_intervals; i++) {
-			for (size_t j = intervals[i].start; j < intervals[i].end; j++) {
-				transform[j] = 0.0f;
-			}
-		}
+	size_t nread = fread(input, sizeof(float), sample_length, stdin);
 
-		inverse_fft(buf, transform, sample_length);
+	fft(transform, input, sample_length);
+	zero_intervals(transform, intervals, num_intervals);
+	inverse_fft(intermediate[1], transform, sample_length);
+	fwrite(output, sizeof(float), sample_length / 2, stdout);
 
-		fwrite(buf, sizeof(float), sample_length, stdout);
+	/* Loput tehdään silmukassa. Viimeinen kierros olisi ehkä myös syytä
+	 * tehdä sen ulkopuolella, mutta ööööööh TODO */
+
+	for (size_t i = 0; nread; i++) {
+		for (size_t j = 0; j < sample_length / 2; j++)
+			input[j] = input[j + sample_length / 2];
+
+		nread = fread(input + sample_length / 2, sizeof(float), sample_length / 2, stdin);
+
+		for (size_t j = sample_length / 2 + nread; j < sample_length; j++)
+			input[j] = 0.0f;
+
+		fft(transform, input, sample_length);
+		zero_intervals(transform, intervals, num_intervals);
+		inverse_fft(intermediate[i & 1], transform, sample_length);
+		interpolate_signal(output, sample_length / 2,
+				intermediate[!(i & 1)] + sample_length / 2,
+				intermediate[i & 1]);
+		fwrite(output, sizeof(float), sample_length / 2, stdout);
 	}
 }
