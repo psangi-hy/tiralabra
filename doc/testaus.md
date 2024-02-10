@@ -12,13 +12,14 @@ Yksikkötestauksen kattavuusraportti
 
 	Lines executed:100.00% of 51
 
-Raportoitu 3.2.2024.
+Raportoitu 10.2.2024.
 
 Mitä ja miten
 -------------
 
 Ainoa automaattinen testaus on tällä hetkellä funktioiden yksikkötestaus. Tämä
 tapahtuu omalla testikehyksellä, kun ajetaan `run_tests.sh` -skripti. Tällä
-hetkellä testataan vain `fft.c` -tiedoston funktioita, koska tiedostossa
-`main.c` ei oikein ole mitään järkevästi yksikkötestattavaa. Itse ohjelmaa
-on testattu vain karkeasti kuuntelemalla sen läpi musiikkia.
+hetkellä testataan vain `fft.c` -tiedoston funktioita.  Tiedostossa `main.c` on
+nyt muutama apufunktio, mutta nämä ovat niin triviaaleja, etten toistaiseksi
+ole katsonut aiheelliseksi yksikkötestata niitä. Itse ohjelmaa on testattu vain
+karkeasti kuuntelemalla sen läpi musiikkia.
