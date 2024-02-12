@@ -144,6 +144,8 @@ main(int argc, char **argv)
 	fft(transform, input, sample_length);
 	zero_intervals(transform, intervals, num_intervals);
 	inverse_fft(intermediate[1], transform, sample_length);
+	for (size_t i = 0; i < sample_length / 2; i++)
+		output[i] = intermediate[1][i];
 	fwrite(output, sizeof(float), sample_length / 2, stdout);
 
 	/* Loput tehdään silmukassa. Viimeinen kierros olisi ehkä myös syytä
