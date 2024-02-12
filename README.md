@@ -20,7 +20,7 @@ Käyttöohje
 ----------
 
 Ohjelma on kirjoitettu Linux-järjestelmille. Tarvittavien riippuvuuksien pitäisi
-olla esiasennettuina fuksiläppäreille, mutta muuten tarvitset seuraavat paketitÖ
+olla esiasennettuina fuksiläppäreille, mutta muuten tarvitset seuraavat paketit:
 
 * `gcc`-kääntäjä
 * `sox`-äänenkäsittelytyökalu

@@ -125,7 +125,7 @@ main(int argc, char **argv)
 	};
 	float *output = calloc(sample_length / 2, sizeof(float));
 
-	/* Jos luemme naiivisti sample_length pistettä tulosignaalia kerallaan
+	/* Jos luemme naiivisti sample_length pistettä tulosignaalia kerrallaan
 	 * ja poistamme siitä taajuuksia, syntyy tulostetussa äänessä ikävää
 	 * poksahtelua, joka johtuu signaalin jatkuvuuden rikkoutumisesta eli
 	 * yhtäkkisistä muutoksista signaalin arvossa. Ajatukseni tämän ongelman
