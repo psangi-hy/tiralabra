@@ -37,6 +37,16 @@ reverse_bits(size_t bits, int num_bits)
 	return res;
 }
 
+/* NOTE: Fft-rutiinit perustuvat sivulta
+ * https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
+ * löytyvään pseudokoodiin. Käänteinen fft-rutiini perustuu
+ * erityisesti siihen, että funktion f käänteinen dft on funktion f
+ * kompleksikonjugaatin dft:n kompleksikonjugaatti jaettuna
+ * lähtöjoukon koolla (eli näiden funktioiden luvulla n). */
+
+/* Apufunktio funktioille fft ja inverse_fft.
+ * n-pituisen taulukon data alkioiden tulee
+ * olla bittikäänteisessä järjestyksessä. */
 static void
 fft_in_place(float complex *data, size_t n) {
 	for (size_t m = 1; m <= n; m <<= 1) {
