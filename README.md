@@ -8,6 +8,8 @@ Dokumentit
 
 [Testausdokumentti](doc/testaus.md)
 
+[Toteutusdokumentti](doc/toteutus.md)
+
 Viikkoraportit
 --------------
 
