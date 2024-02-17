@@ -12,7 +12,7 @@ Yksikkötestauksen kattavuusraportti
 
 	Lines executed:100.00% of 51
 
-Raportoitu 10.2.2024.
+Raportoitu 17.2.2024.
 
 Mitä ja miten
 -------------
