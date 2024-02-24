@@ -18,6 +18,7 @@ Viikkoraportit
 [3](doc/viikkoraportti_3.pdf)
 [4](doc/viikkoraportti_4.pdf)
 [5](doc/viikkoraportti_5.pdf)
+[6](doc/viikkoraportti_6.pdf)
 
 Käyttöohje
 ----------
