@@ -1,6 +1,6 @@
 #!/bin/sh
 [ -e *.gcda ] && rm *.gcda
-gcc --coverage -fprofile-exclude-files=test\.c -o test test.c -lm \
+gcc -g --coverage -fprofile-exclude-files=test\.c -o test test.c -lm \
 	|| exit 1
 
 ./test

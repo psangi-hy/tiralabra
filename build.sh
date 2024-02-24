@@ -1,3 +1,3 @@
 #!/bin/sh
 
-gcc main.c -lm
+gcc -g main.c -lm
