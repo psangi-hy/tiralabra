@@ -1,10 +1,14 @@
 #include <assert.h>
 #include <complex.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "fft.c"
+
+#define LENGTH(A) (sizeof(A) / sizeof((A)[0]))
 
 /* Hylkää testin, jos ehdon A arvo on epätosi. */
 #define TEST_ASSERT(A) _test_assert(A, #A)
@@ -54,8 +58,7 @@ _test_assert(int value, char *string)
  * Testit.
  */
 
-static float fft_test_input[8] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
-static float complex fft_test_desired_output[8] = {
+static float complex fft_test_amplitudes_1[8] = {
 	6.0f     + I * 0.0f,
 	-0.7071f - I * 1.7071f,
 	1.0f     - I * 1.0f,
@@ -64,6 +67,30 @@ static float complex fft_test_desired_output[8] = {
 	0.7071f  - I * 0.2929f,
 	1.0f     + I * 1.0f,
 	-0.7071f + I * 1.7071f,
+};
+
+static float complex fft_test_amplitudes_2[128] = {
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+};
+
+static float complex fft_test_amplitudes_3[1] = { 8.0f };
+
+static float complex fft_test_amplitudes_4[128] = {
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 };
 
 /* Vertaa n-pituisten taulukoiden a ja b arvoja. */
@@ -92,24 +119,82 @@ real32_array_approx_equal(float *a, float *b, size_t n)
 	return 1;
 }
 
+/* Muodostaa signaalin dft-komponenteista suoraan
+ * sini- ja kosinifunktioiden avulla. Tuloksen
+ * pitäisi olla sama kuin funktiolla inverse_fft. */
+static float *
+construct_signal(float complex *amplitudes, size_t n)
+{
+	float *signal = calloc(n, sizeof(float));
+
+	for (size_t i = 0; i < n; i++)
+		signal[i] = cabsf(amplitudes[0]) / n;
+
+	for (size_t i = 1; i < n; i++) {
+		float complex amp = amplitudes[i];
+		float dx = -(2 * M_PI * i) / n; /* Miksi tämän on oltava negatiivinen? */
+
+		for (size_t j = 0; j < n; j++) {
+			float x = j * dx;
+			signal[j] += (crealf(amp) * cosf(x) + cimagf(amp) * sinf(x)) / n;
+		}
+	}
+
+	return signal;
+}
+
+#define TEST_FFT(A) _test_fft((A), LENGTH(A))
+
+static int
+_test_fft(float complex *amplitudes, size_t n)
+{
+	float *signal = construct_signal(amplitudes, n);
+	float complex *transform = calloc(n, sizeof(float complex));
+
+	fft(transform, signal, n);
+
+	int res = complex64_array_approx_equal(amplitudes, transform, n);
+
+	free(signal);
+	free(transform);
+
+	return res;
+}
+
 static void
 test_fft()
 {
-	float complex output[8];
+	TEST_ASSERT(TEST_FFT(fft_test_amplitudes_1));
+	TEST_ASSERT(TEST_FFT(fft_test_amplitudes_2));
+	TEST_ASSERT(TEST_FFT(fft_test_amplitudes_3));
+	TEST_ASSERT(TEST_FFT(fft_test_amplitudes_4));
+}
 
-	fft(output, fft_test_input, 8);
+#define TEST_INVERSE_FFT(A) _test_inverse_fft((A), LENGTH(A))
 
-	TEST_ASSERT(complex64_array_approx_equal(output, fft_test_desired_output, 8));
+static int
+_test_inverse_fft(float complex *amplitudes, size_t n)
+{
+	float *reference_transform = construct_signal(amplitudes, n);
+	float *transform = calloc(n, sizeof(float));
+
+	inverse_fft(transform, amplitudes, n);
+
+	int res = real32_array_approx_equal(reference_transform, transform, n);
+
+	free(reference_transform);
+	free(transform);
+	
+	return res;
 }
 
 static void
 test_inverse_fft()
 {
-	float output[8];
-
-	inverse_fft(output, fft_test_desired_output, 8);
-
-	TEST_ASSERT(real32_array_approx_equal(output, fft_test_input, 8));
+	TEST_ASSERT(TEST_INVERSE_FFT(fft_test_amplitudes_1));
+	TEST_ASSERT(TEST_INVERSE_FFT(fft_test_amplitudes_2));
+	TEST_ASSERT(TEST_INVERSE_FFT(fft_test_amplitudes_3));
+	TEST_ASSERT(TEST_INVERSE_FFT(fft_test_amplitudes_4));
 }
 
 static void
