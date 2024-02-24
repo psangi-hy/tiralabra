@@ -4,7 +4,8 @@ Testausdokumentti
 Yksikkötestauksen kattavuusraportti
 -----------------------------------
 
-	4/4 tests passed.
+	Assertion "TEST_FFT(fft_test_amplitudes_4)" failed in test "test_fft".
+	3/4 tests passed.
 
 	File 'fft.c'
 	Lines executed:100.00% of 51
@@ -12,7 +13,7 @@ Yksikkötestauksen kattavuusraportti
 
 	Lines executed:100.00% of 51
 
-Raportoitu 17.2.2024.
+Raportoitu 24.2.2024.
 
 Mitä ja miten
 -------------
