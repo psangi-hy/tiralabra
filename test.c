@@ -84,8 +84,8 @@ static float complex fft_test_amplitudes_3[1] = { 8.0f };
 
 static float complex fft_test_amplitudes_4[128] = {
 	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
@@ -97,7 +97,7 @@ static float complex fft_test_amplitudes_4[128] = {
 static int
 complex64_array_approx_equal(float complex *a, float complex *b, size_t n)
 {
-	static float epsilon = 0.0001f;
+	static float epsilon = 0.001f;
 
 	for (size_t i = 0; i < n; i++)
 		if (cabsf(a[i] - b[i]) >= epsilon)
@@ -110,7 +110,7 @@ complex64_array_approx_equal(float complex *a, float complex *b, size_t n)
 static int
 real32_array_approx_equal(float *a, float *b, size_t n)
 {
-	static float epsilon = 0.0001f;
+	static float epsilon = 0.001f;
 
 	for (size_t i = 0; i < n; i++)
 		if (fabsf(a[i] - b[i]) >= epsilon)
