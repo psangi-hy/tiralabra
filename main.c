@@ -59,11 +59,12 @@ parse_size(char *s)
 /* Aseta nollaksi taulukon data alkiot, jotka annetaan num_interval-pituisessa
  * taulukossa intervals. */
 static void
-zero_intervals(float complex *data, struct interval *intervals, size_t num_intervals)
+zero_intervals(float complex *data, size_t n, struct interval *intervals, size_t num_intervals)
 {
 	for (size_t i = 0; i < num_intervals; i++) {
-		for (size_t j = intervals[i].start; j < intervals[i].end; j++) {
+		for (size_t j = intervals[i].start; j <= intervals[i].end; j++) {
 			data[j] = 0.0f;
+			data[(1 - j) & (n - 1)] = 0.0f;
 		}
 	}
 }
@@ -98,10 +99,10 @@ main(int argc, char **argv)
 
 	char *end;
 
-	size_t sample_length = parse_size(argv[1]);
+	size_t sample_length = parse_size(argv[1]) * 2;
 
-	if (!is_power_of_2(sample_length) || sample_length & 1)
-		die("%s ei ole kahden positiivinen potenssi.\n", argv[1]);
+	if (!is_power_of_2(sample_length))
+		die("%s ei ole kahden potenssi.\n", argv[1]);
 
 	size_t num_intervals = ((argc - 2) + 1) / 2;
 	struct interval *intervals = calloc(num_intervals, sizeof(struct interval));
@@ -109,10 +110,14 @@ main(int argc, char **argv)
 	for (size_t i = 0; i < num_intervals; i++) {
 		intervals[i].start = parse_size(argv[i * 2 + 2]);
 
-		if (argc > i * 2 + 3)
+		if (argc > i * 2 + 3) {
 			intervals[i].end = parse_size(argv[i * 2 + 3]);
-		else
-			intervals[i].end = sample_length;
+
+			if (intervals[i].end <= sample_length / 2)
+				continue;
+		}
+
+		intervals[i].end = sample_length / 2;
 	}
 
 	/* Varaa puskurit signaalinkäsittelysilmukkaa varten. */
@@ -142,7 +147,7 @@ main(int argc, char **argv)
 	size_t nread = fread(input, sizeof(float), sample_length, stdin);
 
 	fft(transform, input, sample_length);
-	zero_intervals(transform, intervals, num_intervals);
+	zero_intervals(transform, sample_length, intervals, num_intervals);
 	inverse_fft(intermediate[1], transform, sample_length);
 	for (size_t i = 0; i < sample_length / 2; i++)
 		output[i] = intermediate[1][i];
@@ -161,7 +166,7 @@ main(int argc, char **argv)
 			input[j] = 0.0f;
 
 		fft(transform, input, sample_length);
-		zero_intervals(transform, intervals, num_intervals);
+		zero_intervals(transform, sample_length, intervals, num_intervals);
 		inverse_fft(intermediate[i & 1], transform, sample_length);
 		interpolate_signal(output, sample_length / 2,
 				intermediate[!(i & 1)] + sample_length / 2,

@@ -43,17 +43,15 @@ missä
   `-d`, jolloin tulos soitetaan suoraan kaiuttimista.
 * otoksen pituus on signaalin kerralla käsiteltävien pisteiden määrä. Samalla
   se on käsiteltävissä olevien taajuuksien lukumäärä, joten poistettavien
-  taajuuksien on oltava tätä lukua pienempiä.
-* poistettavat taajuudet ovat lukupareja, jossa parin ensimmäinen numero antaa
+  taajuuksien on oltava tätä lukua pienempiä tai yhtä suuria.
+* poistettavat taajuudet ovat lukupareja, jossa parin ensimmäinen luku antaa
   välin alkupisteen ja toinen sen loppupisteen. Jos lukuja on pariton määrä,
   viimeisen välin loppupiste on otoksen pituus.
 
 Esimerkiksi
 
-	./filter.sh tiedosto.wav -d 4096 96 1000 3096 4000
+	./filter.sh tiedosto.wav -d 4096 100 1000
 
 soittaa kaiuttimista tiedoston `tiedosto.wav` sisällön, josta on poistettu
-taajuudet väleiltä 96--1000 ja 3096--4000, kun signaali on jaettu 4096
-taajuuteen. Huomaa, että matalat taajuudet vaikuttavat olevan reunoilla ja
-korkeat keskellä, joten poistettavat taajuudet kannattaa peilata keskipisteen
-suhteen (tässä tapauksessa 2048).
+taajuudet väliltä 100--1000, kun signaali on jaettu 4096
+taajuuteen.
