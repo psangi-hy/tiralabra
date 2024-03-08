@@ -24,7 +24,7 @@ Mitä ja miten
 Ainoa automaattinen testaus on tällä hetkellä funktioiden yksikkötestaus. Tämä
 tapahtuu omalla testikehyksellä, kun ajetaan `run_tests.sh` -skripti.
 Yksikkötestaus koskee kaikkia tiedoston `fft.c` funktiota sekä joitakin
-tiedoston `application.c` funktioista. Viimeksimainitusta tiedostossa ei
+tiedoston `application.c` funktioista. Viimeksi mainitussa tiedostossa ei
 testata seuraavia funktiota:
 
 * `die`, joka pysäyttää ohjelman virhetilanteessa, ja jota ei ole kovin
