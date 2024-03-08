@@ -8,10 +8,12 @@ synteneen tuloksen. C-ohjelma käynnistetään skriptin avulla, joka käyttää
 ulkoista työkalua (Sox) äänidatan purkamiseen tiedostosta ja sen kirjoittamiseen
 uuteen tiedostoon tai soittamiseen kaiuttimesta.
 
-C-ohjelman aloituspiste on tiedoston `main.c` `main`-funktio, joka sisältää
-argumenttien käsittelyn ja koko ohjelman pääsilmukan. Fourier-algoritmit
-löytyvät tiedostosta `fft.c`. Tiedosto `test.c` sisältää toisen `main`-funktion
-ja käännetään vain yksikkötestauksen yhteydessä.
+C-ohjelman aloituspiste on tiedoston `main.c` `main`-funktio, joka käsittelee
+komentoriviargumentit ja kutsuu ohjelman pääsilmukan sisältävää funktiota.
+Pääsilmukka ja sovellukseen liittyvät apufunktiot löytyvät tiedostosta
+`application.c`. Fourier-algoritmit taas löytyvät tiedostosta `fft.c`. Tiedosto
+`test.c` sisältää toisen `main`-funktion ja käännetään vain yksikkötestauksen
+yhteydessä.
 
 Käytetty diskreetti Fourier-muunnosalgoritmi on totetutettu nopeana
 Fourier-muunnoksena, eli sen aikavaativuus suhteessa syötteen pituuteen $n$ on
