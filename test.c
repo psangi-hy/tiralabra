@@ -58,6 +58,7 @@ _test_assert(int value, char *string)
  * Testit.
  */
 
+/* Funktion (1, 1, 0, 0, 0, 0, 0, 0) dft. */
 static float complex fft_test_amplitudes_1[8] = {
 	6.0f     + I * 0.0f,
 	-0.7071f - I * 1.7071f,
@@ -69,35 +70,33 @@ static float complex fft_test_amplitudes_1[8] = {
 	-0.7071f + I * 1.7071f,
 };
 
-static float complex fft_test_amplitudes_2[128] = {
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+/* Yhden pisteen funktion dft on funktio itse. */
+static float complex fft_test_amplitudes_2[1] = { 8.0f };
+
+/* Nollafunktion dft on nollafunktio. */
+static float complex fft_test_amplitudes_3[4096];
+
+/* Vakiofunktion dft. */
+static float complex fft_test_amplitudes_4[4096] = {
+	[0] = 8000.0f,
 };
 
-static float complex fft_test_amplitudes_3[1] = { 8.0f };
-
-static float complex fft_test_amplitudes_4[128] = {
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+/* Reaalisen funktion dft. */
+static float complex fft_test_amplitudes_5[4096] = {
+	[200] = 2000.0f,
+	[300] = 1400.0f + I * 1400.0f,
+	[400] = I * 2000.0f,
+	[3696] = -I * 2000.0f,
+	[3796] = 1400.0f - I * 1400.0f,
+	[3896] = 2000.0f,
 };
 
-/* Vertaa n-pituisten taulukoiden a ja b arvoja. */
+/* Vertaa n-pituisten taulukoiden a ja b arvoja.
+ * Pidemmällä taulukolla sallitaan suurempi virhe. */
 static int
 complex64_array_approx_equal(float complex *a, float complex *b, size_t n)
 {
-	static float epsilon = 0.001f;
+	float epsilon = 0.000244140625 * n;
 
 	for (size_t i = 0; i < n; i++)
 		if (cabsf(a[i] - b[i]) >= epsilon)
@@ -106,11 +105,12 @@ complex64_array_approx_equal(float complex *a, float complex *b, size_t n)
 	return 1;
 }
 
-/* Vertaa n-pituisten taulukoiden a ja b arvoja. */
+/* Vertaa n-pituisten taulukoiden a ja b arvoja.
+ * Pidemmällä taulukolla sallitaan suurempi virhe. */
 static int
 real32_array_approx_equal(float *a, float *b, size_t n)
 {
-	static float epsilon = 0.001f;
+	float epsilon = 0.000244140625 * n;
 
 	for (size_t i = 0; i < n; i++)
 		if (fabsf(a[i] - b[i]) >= epsilon)
@@ -143,8 +143,8 @@ construct_signal(float complex *amplitudes, size_t n)
 	return signal;
 }
 
+/* Funktion test_fft apufunktio. */
 #define TEST_FFT(A) _test_fft((A), LENGTH(A))
-
 static int
 _test_fft(float complex *amplitudes, size_t n)
 {
@@ -161,6 +161,8 @@ _test_fft(float complex *amplitudes, size_t n)
 	return res;
 }
 
+/* Testaa, että testisyötteistä rakennetuista signaaleista
+ * saadut fft:t ovat suunnilleen yhtä kuin testisyötteet. */
 static void
 test_fft()
 {
@@ -168,10 +170,11 @@ test_fft()
 	TEST_ASSERT(TEST_FFT(fft_test_amplitudes_2));
 	TEST_ASSERT(TEST_FFT(fft_test_amplitudes_3));
 	TEST_ASSERT(TEST_FFT(fft_test_amplitudes_4));
+	TEST_ASSERT(TEST_FFT(fft_test_amplitudes_5));
 }
 
+/* Funktion test_inverse_fft apufunktio. */
 #define TEST_INVERSE_FFT(A) _test_inverse_fft((A), LENGTH(A))
-
 static int
 _test_inverse_fft(float complex *amplitudes, size_t n)
 {
@@ -188,6 +191,8 @@ _test_inverse_fft(float complex *amplitudes, size_t n)
 	return res;
 }
 
+/* Testaa, että testisyötteistä saadut käänteiset fft:t ovat
+ * suunnilleen yhtä kuin niistä triviaalisti rakennetut signaalit. */
 static void
 test_inverse_fft()
 {
@@ -195,6 +200,7 @@ test_inverse_fft()
 	TEST_ASSERT(TEST_INVERSE_FFT(fft_test_amplitudes_2));
 	TEST_ASSERT(TEST_INVERSE_FFT(fft_test_amplitudes_3));
 	TEST_ASSERT(TEST_INVERSE_FFT(fft_test_amplitudes_4));
+	TEST_ASSERT(TEST_INVERSE_FFT(fft_test_amplitudes_5));
 }
 
 static void
