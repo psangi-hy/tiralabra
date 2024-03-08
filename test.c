@@ -51,7 +51,7 @@ _test_assert(int value, char *string)
 		return;
 
 	_current_test_passed = 0;
-	printf("Assertion \"%s\" failed in test \"%s\".\n", string, _current_test_name);
+	printf("\"%s\" epäonnistui testissä \"%s\".\n", string, _current_test_name);
 }
 
 /*
@@ -232,7 +232,7 @@ main()
 	RUN_TEST(test_is_power_of_2);
 	RUN_TEST(test_reverse_bits);
 
-	printf("%lu/%lu tests passed.\n", num_tests_passed, num_tests_run);
+	printf("%lu/%lu testiä onnistui.\n", num_tests_passed, num_tests_run);
 
 	if (num_tests_passed == num_tests_run)
 		return 0;
