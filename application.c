@@ -4,6 +4,7 @@ struct interval {
 
 static char *argv0;
 
+#ifndef TEST_BUILD
 /* Tulosta viesti ja pysähdy. */
 static void
 die(char *format, ...)
@@ -29,6 +30,7 @@ die(char *format, ...)
 
 	exit(1);
 }
+#endif
 
 /* Lue size_t merkkijonosta s.
  * Pysähdy, jos s sisältää muuta roskaa. */

@@ -6,7 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TEST_BUILD
+#define die(...) do { _die_flag = 1; return 0; } while (0)
+
+static int _die_flag = 0;
+
 #include "fft.c"
+#include "application.c"
 
 #define LENGTH(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -52,6 +58,16 @@ _test_assert(int value, char *string)
 
 	_current_test_passed = 0;
 	printf("\"%s\" epäonnistui testissä \"%s\".\n", string, _current_test_name);
+}
+
+/* Kertoo, onko ohjelma kutsunut die-funktiota sen
+ * jälkeen, kun se viimeksi kutsui tätä funktiota. */
+static int
+reset_die_flag()
+{
+	int res = _die_flag;
+	_die_flag = 0;
+	return res;
 }
 
 /*
@@ -224,6 +240,51 @@ test_reverse_bits()
 	TEST_ASSERT(reverse_bits(1, 64) == 1UL << 63);
 }
 
+static void
+test_parse_size()
+{
+	TEST_ASSERT(parse_size("0") == 0 && !reset_die_flag());
+	TEST_ASSERT(parse_size("999") == 999);
+	TEST_ASSERT(parse_size("232339923") == 232339923);
+	TEST_ASSERT(parse_size("hello") == 0 && reset_die_flag());
+	TEST_ASSERT(parse_size("20000k") == 0 && reset_die_flag());
+}
+
+static void
+test_interpolate_signal()
+{
+	static float zero_array[128];
+	static float input[128];
+	static float output[128];
+
+	for (size_t i = 0; i < LENGTH(input); i++)
+		input[i] = (float)i;
+
+	/* Interpolaatio pituudella 0 ei tee mitään. */
+	interpolate_signal(output, 0, input, input);
+	TEST_ASSERT(real32_array_approx_equal(output, zero_array, LENGTH(output)));
+
+	/* Interpolaatio signaalista itseensä tuottaa saman funktion. */
+	interpolate_signal(output, LENGTH(output), input, input);
+	TEST_ASSERT(real32_array_approx_equal(output, input, LENGTH(output)));
+
+	/* Tulosfunktio on jokaisessa pisteessä syötefunktioiden välissä. */
+	interpolate_signal(output, LENGTH(output), zero_array, input);
+
+	for (size_t i = 0; i < LENGTH(output); i++)
+		TEST_ASSERT(output[i] >= zero_array[i] && output[i] <= input[i]);
+
+	/* Interpolaatio vakiofunktioiden välillä on lineaarinen interpolaatio vakiosta toiseen. */
+	for (size_t i = 0; i < LENGTH(input); i++)
+		input[i] = 1.0f;
+
+	interpolate_signal(output, LENGTH(output), zero_array, input);
+
+	float step = 1.0f / LENGTH(output);
+	for (size_t i = 0; i < LENGTH(output); i++)
+		TEST_ASSERT(fabsf(output[i] - (step / 2 + step * i)) < 0.0001f);
+}
+
 int
 main()
 {
@@ -231,6 +292,8 @@ main()
 	RUN_TEST(test_inverse_fft);
 	RUN_TEST(test_is_power_of_2);
 	RUN_TEST(test_reverse_bits);
+	RUN_TEST(test_parse_size);
+	RUN_TEST(test_interpolate_signal);
 
 	printf("%lu/%lu testiä onnistui.\n", num_tests_passed, num_tests_run);
 
