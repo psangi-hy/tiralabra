@@ -4,23 +4,30 @@ Testausdokumentti
 Yksikkötestauksen kattavuusraportti
 -----------------------------------
 
-	Assertion "TEST_FFT(fft_test_amplitudes_4)" failed in test "test_fft".
-	3/4 tests passed.
-
+	6/6 testiä onnistui.
+	
+	File 'application.c'
+	Lines executed:27.66% of 47
+	Creating 'application.c.gcov'
+	
 	File 'fft.c'
 	Lines executed:100.00% of 51
 	Creating 'fft.c.gcov'
+	
+	Lines executed:65.31% of 98
 
-	Lines executed:100.00% of 51
-
-Raportoitu 24.2.2024.
+Raportoitu 8.3.2024.
 
 Mitä ja miten
 -------------
 
 Ainoa automaattinen testaus on tällä hetkellä funktioiden yksikkötestaus. Tämä
-tapahtuu omalla testikehyksellä, kun ajetaan `run_tests.sh` -skripti. Tällä
-hetkellä testataan vain `fft.c` -tiedoston funktioita.  Tiedostossa `main.c` on
-nyt muutama apufunktio, mutta nämä ovat niin triviaaleja, etten toistaiseksi
-ole katsonut aiheelliseksi yksikkötestata niitä. Itse ohjelmaa on testattu vain
-karkeasti kuuntelemalla sen läpi musiikkia.
+tapahtuu omalla testikehyksellä, kun ajetaan `run_tests.sh` -skripti.
+Yksikkötestaus koskee kaikkia tiedoston `fft.c` funktiota sekä joitakin
+tiedoston `application.c` funktioista. Viimeksimainitusta tiedostossa ei
+testata seuraavia funktiota:
+
+* `die`, joka pysäyttää ohjelman virhetilanteessa, ja jota ei ole kovin
+  mielekästä yksikkötestata,
+* `zero_intervals`, jota on triviaaliuteensa nähden kovin hankala testata,
+* `process_input`, joka sisältää ohjelman pääsilmukan.
